@@ -1,6 +1,6 @@
 import gi, sys
 gi.require_version('Gtk','3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 import gtkWindow as gw
 import tempXml as txml
 
@@ -17,13 +17,38 @@ class ListBoxRowWithData(Gtk.ListBoxRow):
 
 
 class aClassThatHandleGtkSignals:
+
     tempTree = ""
     lastClicked = ""
     fileAddress = ""
+    gridAdded = False 
+
+    def window_size_changed(self):
+    	windowWidth = aClassThatHandleGtkSignals.window.get_size()[0]
+    	windowHeight = aClassThatHandleGtkSignals.window.get_size()[1]
+    	print("En : ",windowWidth," Boy : ",windowHeight)
+    	if(aClassThatHandleGtkSignals.gridAdded == True):
+    		print("grid var")
+    		gridImageWidth = (windowWidth//3)-5
+    		gridImageHeight = (windowHeight//3)-5
+    		print("gridImageWidth :",gridImageWidth,"gridImageHeight :",gridImageHeight)
+    		for i in range(3): # Grid bos oldugu icin gozukmuyor. Gecici resimler ekliyorum.
+    			for j in range(3):
+    				pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename="images.jpg",width=gridImageWidth,height=gridImageHeight)
+    				img = Gtk.Image.new_from_pixbuf(pixbuf)
+    				img.set_hexpand(True)
+    				img.set_vexpand(True)
+    				aClassThatHandleGtkSignals.grid.attach(img,i,j,1,1)
+    		aClassThatHandleGtkSignals.grid.set_row_spacing(1)
+    		aClassThatHandleGtkSignals.grid.set_column_spacing(1)
+    		aClassThatHandleGtkSignals.window.show_all()
+
     window = Gtk.Window() # application window
+    window.connect('check-resize',window_size_changed)
     window.set_default_size(587,540)
     window.set_position(Gtk.WindowPosition.CENTER)
     window.set_name("newProject")
+    grid = Gtk.Grid()
     
     def onQuit(self, *a, **kv):
         print("exit")
@@ -99,8 +124,27 @@ class aClassThatHandleGtkSignals:
         aClassThatHandleGtkSignals.window.add(self.buton)
         aClassThatHandleGtkSignals.window.show_all()
     def gridEkle(self, *a, **kv): #NOT COMPLETED YET
-    	self.grid = Gtk.Grid()
+    	aClassThatHandleGtkSignals.gridAdded = True;
     	gw.addGrid(aClassThatHandleGtkSignals.lastClicked, aClassThatHandleGtkSignals.tempTree)
+    	aClassThatHandleGtkSignals.window.add(aClassThatHandleGtkSignals.grid)
+    	windowWidth = aClassThatHandleGtkSignals.window.get_size()[0]
+    	windowHeight = aClassThatHandleGtkSignals.window.get_size()[1]
+    	gridImageWidth = (windowWidth/3)-2
+    	gridImageHeight = (windowHeight/3)-2
+    	for i in range(3): # Grid bos oldugu icin gozukmuyor. Gecici resimler ekliyorum.
+    		for j in range(3):
+    			pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename="images.jpg",width=gridImageWidth,height=gridImageHeight)
+    			img = Gtk.Image.new_from_pixbuf(pixbuf)
+    			img.set_hexpand(True)
+    			img.set_vexpand(True)
+    			aClassThatHandleGtkSignals.grid.attach(img,i,j,1,1)
+    	aClassThatHandleGtkSignals.grid.set_row_spacing(1)
+    	aClassThatHandleGtkSignals.grid.set_column_spacing(1)
+    	aClassThatHandleGtkSignals.grid.set_row_homogeneous(True)
+    	aClassThatHandleGtkSignals.grid.set_column_homogeneous(True)
+    	aClassThatHandleGtkSignals.window.show_all()
+
+
         
 class MainWindow(Gtk.Window): #TEST
 
